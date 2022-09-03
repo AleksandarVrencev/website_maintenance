@@ -1,0 +1,46 @@
+// novi proizvodi
+
+//selektuj sve proizvode iz zaliha kojih nema u fisherman 
+SELECT Artikal, Naziv, Cena
+FROM zalihe
+WHERE Artikal NOT IN (SELECT sifra FROM fisherman)
+/////////////////////////////////////
+// promena cena na nulu
+
+//proizvodi iz fisherman kojih nema u zalihe
+SELECT fisherman.ID, naslov, sifra, cena
+FROM fisherman
+WHERE sifra NOT IN (SELECT Artikal FROM zalihe)
+
+//proizvodi iz fisherman koji su u zalihe i stanje je manje od 1
+SELECT fisherman.ID,naslov,sifra,cena
+FROM fisherman
+WHERE sifra IN (SELECT Artikal FROM zalihe WHERE Stanje < 1)
+///////////////////////////////////////
+// promena cena proizvoda koji su u fisherman i zalihe i stanje je vece od nula, ali
+im se cene razlikuju
+
+//poredjenje cena
+SELECT naslov,sifra, fisherman.cena, zalihe.ID, Naziv, Artikal, zalihe.cena, stanje
+FROM fisherman, zalihe
+WHERE sifra = Artikal
+AND fisherman.cena <> zalihe.cena
+AND stanje > 0
+//////////////////////////////////////////
+// poredjenje kategorija,kategorije iz liste kategorije su validne
+SELECT sifra, kategorija, Artikal, Grupa
+FROM fisherman, kategorije
+WHERE sifra = Artikal
+AND kategorija <> Grupa
+
+///////////////////////////RAZNO//////////////////////////////////////////////
+//promena cene u fisherman ako proizvoda nema u zalihe ili je stanje zaliha tih proizvoda manje od 1
+UPDATE fisherman
+SET cena = 0
+WHERE sifra NOT IN (SELECT Artikal FROM zalihe)
+OR sifra IN (SELECT Artikal FROM zalihe WHERE Stanje < 1)
+
+// selektuj proizvod na osnovu upisane sifre
+select naslov, sifra, cena, kategorija
+from fisherman
+where sifra = '7SP 64810'
