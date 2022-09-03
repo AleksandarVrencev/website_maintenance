@@ -1,10 +1,15 @@
+from tkinter import messagebox
 from openpyxl import Workbook, load_workbook
 from srtools import *
+from front import *
 
+# ucitavanje excel fajlova na osnovu izabranih fajlova u front.py 
 fisherman_book = load_workbook(filename='fisherman.xlsx')
+#fisherman_book = load_workbook(filename=fisherman_front)
 zalihe_book = load_workbook(filename='zalihe.xlsx')
+#zalihe_book = load_workbook(filename=zalihe_front)
 kategorije_book = load_workbook(filename='kategorije.xlsx')
-
+#kategorije_book = load_workbook(filename=kategorije_front)
 fisherman = fisherman_book.active
 zalihe = zalihe_book.active
 kategorije = kategorije_book.active
@@ -108,6 +113,7 @@ def pretraga_po_sifri(pojam_za_pretragu):
                 break
             else:
                 continue
+
 
 # zapamti u excel
 def save_excel():
