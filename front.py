@@ -4,26 +4,9 @@ from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from script import *
 
-
 top = tk.Tk()
 top.title("Front")
 top.geometry("400x200")
-
-
-def save():
-    pass
-
-def preview():
-    print("Preview")
-
-def import_fisherman():
-    print("Import Fisherman")
-
-def import_zalihe():
-    print("Import Zalihe")
-
-def import_kategorije():
-    print("Import Kategorije")
 
 fisherman_front = ''
 zalihe_front = ''
@@ -35,6 +18,7 @@ def uvoz_fisherman():
     filename = fd.askopenfilename(title='Open a file', initialdir='/Desktop', filetypes=filetypes)
     fisherman_front = filename
     print(fisherman_front)
+    ucitavanje()
     #showinfo(title='Selected File', message=filename)
 
 def uvoz_zalihe():
@@ -42,17 +26,28 @@ def uvoz_zalihe():
     filename = fd.askopenfilename(title='Open a file', initialdir='/Desktop', filetypes=filetypes)
     zalihe_front = filename
     print(zalihe_front)
+    ucitavanje()
 
 def uvoz_kategorije():
     filetypes = (('excel', '*.xls'), ('excel', '*.xlsx'), ('excel', '*.xlsm'))
     filename = fd.askopenfilename(title='Open a file', initialdir='/Desktop', filetypes=filetypes)
     kategorije_front = filename
     print(kategorije_front)
+    ucitavanje()
     
-btn_save = tk.Button(top, text="Save", command=import_fisherman)
-btn_save.pack()
-btn_preview = tk.Button(top, text="Preview", command=preview)
-btn_preview.pack()
+def sredi_cene():
+    promena_opisa()
+    poredjenje_cena()
+    promena_cene_zalihe()
+    promena_cene_stanje()
+    promena_kategorije()
+    novi_proizvodi()
+    save_excel()
+
+btn_sredi_cene = tk.Button(top, text="Sredi cene", command=sredi_cene)
+btn_sredi_cene.pack()
+btn_pretraga = tk.Button(top, text="Pretrazi" , command=pretraga_po_sifri)
+btn_pretraga.pack()
 btn_import_fisherman = tk.Button(top, text="Import Fisherman", command=uvoz_fisherman)
 btn_import_fisherman.pack()
 btn_import_zalihe = tk.Button(top, text="Import Zalihe", command=uvoz_zalihe)

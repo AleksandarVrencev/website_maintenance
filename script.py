@@ -1,7 +1,7 @@
 from tkinter import messagebox
+from tkinter.simpledialog import askstring
 from openpyxl import Workbook, load_workbook
 from srtools import *
-from front import *
 
 # ucitavanje excel fajlova na osnovu izabranih fajlova u front.py 
 fisherman_book = load_workbook(filename='fisherman.xlsx')
@@ -106,13 +106,14 @@ def poredjenje_cena():
                 cena_fisherman[i].value = cena_zalihe[j].value
 
 # pretraga proizvoda po sifri
-def pretraga_po_sifri(pojam_za_pretragu):
-        for i in range(sifra_fisherman.__len__()):
-            if pojam_za_pretragu == sifra_fisherman[i].value:
-                print("naziv: " + naslov_fisherman[i].value + "\nsifra: " + sifra_fisherman[i].value + "\ncena: " + str(cena_fisherman[i].value))
-                break
-            else:
-                continue
+def pretraga_po_sifri():
+    value = askstring("Pretraga", "Unesite trazeni pojam: ")
+    for i in range(sifra_fisherman.__len__()):
+        if value in sifra_fisherman[i].value or value in naslov_fisherman[i].value:
+            print("naziv: " + naslov_fisherman[i].value + "\nsifra: " + sifra_fisherman[i].value + "\ncena: " + str(cena_fisherman[i].value))
+            #break
+        else:
+            continue
 
 
 # zapamti u excel
