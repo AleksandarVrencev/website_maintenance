@@ -106,6 +106,7 @@ def promena_opisa():
 
 # novi proizvodi koji se nalaze u zalihama ali nisu u fishermanu 
 def novi_proizvodi():
+    #novi_proizvodi_list.clear()
     print("novi proizvodi: ")
     for i in range(1,artikal_list.__len__()):
         if artikal_list[i] not in sifra_list:
@@ -128,7 +129,7 @@ def novi_proizvodi():
         report_sheet.append(["artikal", "naziv", "stanje", "cena"])
         for i in range(novi_proizvodi_list.__len__()):
             report_sheet.append(novi_proizvodi_list[i])
-        report_book.save("report.xlsx")
+        report_book.save("reportaza.xlsx")
         showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
 
 # funkcija za proveru i promenu kategorije
