@@ -9,6 +9,12 @@ import tkinter as tk
 from tkinter.messagebox import showinfo
 import os
 
+fisherman_front, zalihe_front, kategorije_front, fisherman_book, zalihe_book, kategorije_book, fisherman, zalihe, kategorije = None, None, None, None, None, None, None, None, None
+naslov_fisherman, cena_fisherman, kategorija_fisherman, opis_fisherman, sifra_fisherman = None, None, None, None, None
+artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe = None, None, None, None
+artikal_kategorije, kategorija_kategorije = None, None
+artikal_list, sifra_list, novi_proizvodi_list, stanje_list = None, None, None, None
+
 top = tk.Tk()
 top.title("Front")
 top.geometry("500x300")
@@ -28,15 +34,15 @@ def ucitaj():
     global naslov_fisherman, cena_fisherman, kategorija_fisherman, opis_fisherman, sifra_fisherman
     global artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe
     global artikal_kategorije, kategorija_kategorije
-    global artikal_list, sifra_list, novi_proizvodi_list, stanje_list
+    global artikal_list, sifra_list, stanje_list
 
     # ucitavanje excel fajlova na osnovu izabranih fajlova u front.py 
-    #fisherman_book = load_workbook(filename='fisherman.xlsx')
-    fisherman_book = load_workbook(filename=fisherman_front)
-    #zalihe_book = load_workbook(filename='zalihe.xlsx')
-    zalihe_book = load_workbook(filename=zalihe_front)
-    #kategorije_book = load_workbook(filename='kategorije.xlsx')
-    kategorije_book = load_workbook(filename=kategorije_front)
+    fisherman_book = load_workbook(filename=fisherman_name)
+    #fisherman_book = load_workbook(filename=fisherman_front)
+    zalihe_book = load_workbook(filename=zalihe_name)
+    #zalihe_book = load_workbook(filename=zalihe_front)
+    kategorije_book = load_workbook(filename=kategorije_name)
+    #kategorije_book = load_workbook(filename=kategorije_front)
     fisherman = fisherman_book.active
     zalihe = zalihe_book.active
     kategorije = kategorije_book.active
@@ -56,7 +62,6 @@ def ucitaj():
     sifra_list = []
     artikal_list = []
     stanje_list = []
-    novi_proizvodi_list = []
 
     for row in sifra_fisherman:
         sifra_list.append(row.value.strip())
@@ -67,32 +72,29 @@ def ucitaj():
     for row in stanje_zalihe:
         stanje_list.append(row.value)
 
-
 # uvoz izabranih fajlova
 filetypes = (('excel', '*.xls'), ('excel', '*.xlsx'), ('excel', '*.xlsm'))
 
 def uvoz_fisherman():
-    global fisherman_front, fisherman_path
+    global fisherman_front, fisherman_name
     filename = fd.askopenfilename(title='Open a file', initialdir='/Desktop', filetypes=filetypes)
     fisherman_front = filename
-    #print(fisherman_front)
-    #fisherman_path = os.path.dirname(fisherman_front)
-    #showinfo(title='Selected File', message=filename)
+    fisherman_name = os.path.basename(fisherman_front)
+    print(fisherman_name)
 
 def uvoz_zalihe():
-    global zalihe_front, zalihe_path
+    global zalihe_front, zalihe_name
     filename = fd.askopenfilename(title='Open a file', initialdir='/Desktop', filetypes=filetypes)
     zalihe_front = filename
-    zalihe_path = os.path.dirname(zalihe_front)
-    print(zalihe_front)
+    zalihe_name = os.path.basename(zalihe_front)
+    print(zalihe_name)
 
 def uvoz_kategorije():
-    global kategorije_front, kategorije_path
+    global kategorije_front, kategorije_name
     filename = fd.askopenfilename(title='Open a file', initialdir='/Desktop', filetypes=filetypes)
     kategorije_front = filename
-    head, tail = os.path.split(kategorije_front)
-    print(kategorije_front)
-    print(tail)
+    kategorije_name = os.path.basename(kategorije_front)
+    print(kategorije_name)
 
 # provera kolone opis i promena cirilice u latinicu
 def promena_opisa():
@@ -107,34 +109,34 @@ def promena_opisa():
 def novi_proizvodi():
     global artikal_list, sifra_list, novi_proizvodi_list, stanje_list
     global artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe
+    global fisherman
+    novi_proizvodi_list = []
     #novi_proizvodi_list.clear()
     print("novi proizvodi: ")
-    print("lista: " + str(novi_proizvodi_list))
     for i in range(1,artikal_list.__len__()):
         if artikal_list[i] not in sifra_list:
             print("artikal: " + artikal_zalihe[i].value + "\nnaziv: " + naziv_zalihe[i].value + "\nstanje: " + str(stanje_zalihe[i].value) + "\ncena: " + str(cena_zalihe[i].value))
             novi_proizvodi_list.append([artikal_zalihe[i].value, naziv_zalihe[i].value, stanje_zalihe[i].value, cena_zalihe[i].value])
             #novi proizvod moze da ima stanje manje od 0 ako ovu funkciju preklopis sa funkcijom promena_cene_stanje()
-            if stanje_zalihe[i].value > 0:
-                counter = 1
-                fisherman.cell(row=fisherman.max_row + counter, column=1).value = naziv_zalihe[i].value
-                fisherman.cell(row=fisherman.max_row , column=2).value = artikal_zalihe[i].value
-                fisherman.cell(row=fisherman.max_row , column=3).value = cena_zalihe[i].value
-                fisherman.cell(row=fisherman.max_row , column=4).value = "kom"
-                fisherman.cell(row=fisherman.max_row , column=13).value = "2021-04-30 00:00:13"
+            #if stanje_zalihe[i].value > 0:
+            fisherman.cell(row=fisherman.max_row + 1, column=1).value = naziv_zalihe[i].value
+            fisherman.cell(row=fisherman.max_row , column=2).value = artikal_zalihe[i].value
+            fisherman.cell(row=fisherman.max_row , column=3).value = cena_zalihe[i].value
+            fisherman.cell(row=fisherman.max_row , column=4).value = "kom"
+            fisherman.cell(row=fisherman.max_row , column=13).value = "2021-04-30 00:00:13"
                      
     print("lista novih proizvoda: " + str(novi_proizvodi_list))
+    #izrada izvestaja o novim proizvodima
+    report = messagebox.askquestion("Report", "Da li zelite da sacuvate report u excel fajl?")
+    if report == 'yes':
+        report_book = Workbook()
+        report_sheet = report_book.active
+        report_sheet.append(["artikal", "naziv", "stanje", "cena", "kategorija"])
+        for i in range(novi_proizvodi_list.__len__()):
+            report_sheet.append(novi_proizvodi_list[i])
+        report_book.save("report.xlsx")
+        showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
     save_excel()
-    # izrada izvestaja o novim proizvodima
-    # report = messagebox.askquestion("Report", "Da li zelite da sacuvate report u excel fajl?")
-    # if report == 'yes':
-    #     report_book = Workbook()
-    #     report_sheet = report_book.active
-    #     report_sheet.append(["artikal", "naziv", "stanje", "cena"])
-    #     for i in range(novi_proizvodi_list.__len__()):
-    #         report_sheet.append(novi_proizvodi_list[i])
-    #     report_book.save("report.xlsx")
-    #     showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
 
 # funkcija za proveru i promenu kategorije
 def promena_kategorije():
@@ -188,9 +190,9 @@ def save_excel():
     # fisherman_book.save('fisherman.xlsx')
     # zalihe_book.save('zalihe.xlsx')
     # kategorije_book.save('kategorije.xlsx')
-    fisherman_book.save(fisherman_front)
-    zalihe_book.save(zalihe_front)
-    kategorije_book.save(kategorije_front)
+    fisherman_book.save(fisherman_name)
+    zalihe_book.save(zalihe_name)
+    kategorije_book.save(kategorije_name)
 
 btn_sredi_cene = tk.Button(top, text="Sredi cene", command=sredi_cene)
 btn_sredi_cene.pack()
