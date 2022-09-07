@@ -5,26 +5,18 @@ from openpyxl import Workbook, load_workbook
 from srtools import *
 from tkinter import filedialog as fd
 import tkinter as tk
-#from tkinter import ttk
 from tkinter.messagebox import showinfo
 import os
 
-fisherman_front, zalihe_front, kategorije_front, fisherman_book, zalihe_book, kategorije_book, fisherman, zalihe, kategorije = None, None, None, None, None, None, None, None, None
-naslov_fisherman, cena_fisherman, kategorija_fisherman, opis_fisherman, sifra_fisherman = None, None, None, None, None
-artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe = None, None, None, None
-artikal_kategorije, kategorija_kategorije = None, None
-artikal_list, sifra_list, novi_proizvodi_list, stanje_list = None, None, None, None
-
 top = tk.Tk()
-top.title("Front")
-top.geometry("500x300")
+top.title("Program za ažuriranje cena") 
+top.geometry("500x200")
 
 def sredi_cene():
     promena_opisa()
     poredjenje_cena()
     promena_cene_zalihe()
     promena_cene_stanje()
-    promena_kategorije()
     save_excel()
 
 def ucitaj():
@@ -38,11 +30,8 @@ def ucitaj():
 
     # ucitavanje excel fajlova na osnovu izabranih fajlova u front.py 
     fisherman_book = load_workbook(filename=fisherman_name)
-    #fisherman_book = load_workbook(filename=fisherman_front)
     zalihe_book = load_workbook(filename=zalihe_name)
-    #zalihe_book = load_workbook(filename=zalihe_front)
     kategorije_book = load_workbook(filename=kategorije_name)
-    #kategorije_book = load_workbook(filename=kategorije_front)
     fisherman = fisherman_book.active
     zalihe = zalihe_book.active
     kategorije = kategorije_book.active
@@ -111,8 +100,6 @@ def novi_proizvodi():
     global artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe
     global fisherman
     novi_proizvodi_list = []
-    #novi_proizvodi_list.clear()
-    print("novi proizvodi: ")
     for i in range(1,artikal_list.__len__()):
         if artikal_list[i] not in sifra_list:
             print("artikal: " + artikal_zalihe[i].value + "\nnaziv: " + naziv_zalihe[i].value + "\nstanje: " + str(stanje_zalihe[i].value) + "\ncena: " + str(cena_zalihe[i].value))
@@ -124,48 +111,54 @@ def novi_proizvodi():
             fisherman.cell(row=fisherman.max_row , column=3).value = cena_zalihe[i].value
             fisherman.cell(row=fisherman.max_row , column=4).value = "kom"
             fisherman.cell(row=fisherman.max_row , column=13).value = "2021-04-30 00:00:13"
-                     
-    print("lista novih proizvoda: " + str(novi_proizvodi_list))
-    #izrada izvestaja o novim proizvodima
-    report = messagebox.askquestion("Report", "Da li zelite da sacuvate report u excel fajl?")
-    if report == 'yes':
-        report_book = Workbook()
-        report_sheet = report_book.active
-        report_sheet.append(["artikal", "naziv", "stanje", "cena", "kategorija"])
-        for i in range(novi_proizvodi_list.__len__()):
-            report_sheet.append(novi_proizvodi_list[i])
-        report_book.save("report.xlsx")
-        showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
+
+    if novi_proizvodi_list.__len__() != 0:                
+        print("lista novih proizvoda: " + str(novi_proizvodi_list))
+        #izrada izvestaja o novim proizvodima
+        report = messagebox.askquestion("Report", "Da li zelite da sacuvate report u excel fajl?")
+        if report == 'yes':
+            report_book = Workbook()
+            report_sheet = report_book.active
+            report_sheet.append(["artikal", "naziv", "stanje", "cena", "kategorija"])
+            for i in range(novi_proizvodi_list.__len__()):
+                report_sheet.append(novi_proizvodi_list[i])
+            report_book.save("report.xlsx")
+            showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
+    else:
+        showinfo(title='Report', message="Nema novih proizvoda")
     save_excel()
 
 # funkcija za proveru i promenu kategorije
 def promena_kategorije():
     for i in range(artikal_kategorije.__len__()):
-        for i in range(sifra_fisherman.__len__()):
-            if artikal_kategorije[i].value == sifra_fisherman[i].value:
-                kategorija_fisherman[i].value = kategorija_kategorije[i].value
-                print(kategorija_fisherman[i].value)
+        for j in range(sifra_fisherman.__len__()):
+            if artikal_kategorije[i].value == sifra_fisherman[j].value and kategorija_fisherman[j].value != kategorija_kategorije[i].value:
+                print('sifra proizvoda: ' + str(sifra_fisherman[j].value) + ' stara kategorija: ' + str(kategorija_fisherman[j].value) + ' nova kategorija: ' + str(kategorija_kategorije[i].value))
+                kategorija_fisherman[j].value = kategorija_kategorije[i].value
             else:
                 continue
+    save_excel()
 
 # proizvodi kojih nema na zalihama ili su na zalihama ali ih nema na stanju, promeni cenu na nulu
 # funkcije su razdvojene zbog performansi
 def promena_cene_zalihe():
     for i in range(sifra_fisherman.__len__()):
         if sifra_fisherman[i].value not in artikal_list and cena_fisherman[i].value != 0:
-            print("fisherman: " + sifra_fisherman[i].value + " cena: " + str(cena_fisherman[i].value) + " nova cena: 0")
+            print("fisherman: " + sifra_fisherman[i].value + " cena: " + str(cena_fisherman[i].value) + " nova cena zalihe: 0")
             cena_fisherman[i].value = 0
         else:
             continue
+    save_excel()
 
 def promena_cene_stanje():
     for i in range(sifra_fisherman.__len__()):
         for j in range(artikal_zalihe.__len__()):
             if sifra_fisherman[i].value == artikal_zalihe[j].value and cena_fisherman[i].value != 0 and stanje_zalihe[j].value < 1:
-                print("fisherman: " + sifra_fisherman[i].value + " cena: " + str(cena_fisherman[i].value) + " nova cena: 0")
+                print("fisherman: " + sifra_fisherman[i].value + " cena: " + str(cena_fisherman[i].value) + " nova cena stanje: 0")
                 cena_fisherman[i].value = 0
             else:
                 continue
+    save_excel()
 
 # funkcija za poredjenje cena na zalihama i u fishermanu
 def poredjenje_cena():
@@ -174,38 +167,49 @@ def poredjenje_cena():
             if sifra_fisherman[i].value == artikal_zalihe[j].value and cena_fisherman[i].value != cena_zalihe[j].value:
                 print("fisherman: " + sifra_fisherman[i].value + " cena: " + str(cena_fisherman[i].value) + " nova cena: " + str(cena_zalihe[j].value))
                 cena_fisherman[i].value = cena_zalihe[j].value
+    save_excel()
 
 # pretraga proizvoda po sifri
 def pretraga_po_sifri():
     value = askstring("Pretraga", "Unesite trazeni pojam: ")
+    flag = 1
     for i in range(sifra_fisherman.__len__()):
-        if value in sifra_fisherman[i].value or value in naslov_fisherman[i].value:
+        # if value in sifra_fisherman[i].value or value in naslov_fisherman[i].value: # ako sadrzi trazeni pojam
+        if value == sifra_fisherman[i].value or value == naslov_fisherman[i].value:   # ako je tacan trazeni pojam
             print("naziv: " + naslov_fisherman[i].value + "\nsifra: " + sifra_fisherman[i].value + "\ncena: " + str(cena_fisherman[i].value))
-            #break
+            showinfo(title='Pretraga', message="naziv: " + naslov_fisherman[i].value + "\nsifra: " + sifra_fisherman[i].value + "\ncena: " + str(cena_fisherman[i].value))
+            flag = 1
+            break
+        elif value == '':
+            showinfo(title='Pretraga', message="Niste uneli pojam za pretragu")
+            break
         else:
+            #showinfo(title='Pretraga', message="Nema rezultata")
+            flag = 0
             continue
+    if flag == 0:
+        showinfo(title='Pretraga', message="Nema rezultata")
 
 # zapamti u excel
 def save_excel():
-    # fisherman_book.save('fisherman.xlsx')
-    # zalihe_book.save('zalihe.xlsx')
-    # kategorije_book.save('kategorije.xlsx')
     fisherman_book.save(fisherman_name)
     zalihe_book.save(zalihe_name)
     kategorije_book.save(kategorije_name)
 
 btn_sredi_cene = tk.Button(top, text="Sredi cene", command=sredi_cene)
-btn_sredi_cene.pack()
+btn_sredi_cene.grid(row=12, column=0, padx=10, pady=10)
 btn_novi_proizvodi = tk.Button(top, text="Novi proizvodi", command=novi_proizvodi)
-btn_novi_proizvodi.pack()
-btn_pretraga = tk.Button(top, text="Pretrazi" , command=pretraga_po_sifri)
-btn_pretraga.pack()
+btn_novi_proizvodi.grid(row=12, column=2, padx=10, pady=10)
+btn_pretraga = tk.Button(top, text="Pretraži" , command=pretraga_po_sifri)
+btn_pretraga.grid(row=12, column=3, padx=10, pady=10)
 btn_import_fisherman = tk.Button(top, text="Import Fisherman", command=uvoz_fisherman)
-btn_import_fisherman.pack()
+btn_import_fisherman.grid(row=3, column=0, padx=20, pady=30)
 btn_import_zalihe = tk.Button(top, text="Import Zalihe", command=uvoz_zalihe)
-btn_import_zalihe.pack()
+btn_import_zalihe.grid(row=3, column=1, padx=10, pady=10)
 btn_import_kategorije = tk.Button(top, text="Import Kategorije", command=uvoz_kategorije)
-btn_import_kategorije.pack()
-btn_ucitaj = tk.Button(top, text="ucitaj", command=ucitaj)
-btn_ucitaj.pack()
+btn_import_kategorije.grid(row=3, column=2, padx=10, pady=10)
+btn_ucitaj = tk.Button(top, text="Učitaj podatke", command=ucitaj)
+btn_ucitaj.grid(row=3, column=3, padx=10, pady=10)
+btn_sredi_kategorije = tk.Button(top, text="Sredi kategorije", command=promena_kategorije)
+btn_sredi_kategorije.grid(row=12, column=1, padx=10, pady=10)
 top.mainloop()
