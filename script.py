@@ -28,7 +28,7 @@ def ucitaj():
     global naslov_fisherman, cena_fisherman, kategorija_fisherman, opis_fisherman, sifra_fisherman
     global artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe
     global artikal_kategorije, kategorija_kategorije
-    global artikal_list, sifra_list, novi_proizvodi_list
+    global artikal_list, sifra_list, novi_proizvodi_list, stanje_list
 
     # ucitavanje excel fajlova na osnovu izabranih fajlova u front.py 
     #fisherman_book = load_workbook(filename='fisherman.xlsx')
@@ -102,16 +102,19 @@ def promena_opisa():
             #print("stara vrednost: " + opis_fisherman[i].value + " nova vrednost: " + cyrillic_to_latin(opis_fisherman[i].value))
         else:
             continue
-    save_excel()
 
 # novi proizvodi koji se nalaze u zalihama ali nisu u fishermanu 
 def novi_proizvodi():
+    global artikal_list, sifra_list, novi_proizvodi_list, stanje_list
+    global artikal_zalihe, naziv_zalihe, cena_zalihe, stanje_zalihe
     #novi_proizvodi_list.clear()
     print("novi proizvodi: ")
+    print("lista: " + str(novi_proizvodi_list))
     for i in range(1,artikal_list.__len__()):
         if artikal_list[i] not in sifra_list:
             print("artikal: " + artikal_zalihe[i].value + "\nnaziv: " + naziv_zalihe[i].value + "\nstanje: " + str(stanje_zalihe[i].value) + "\ncena: " + str(cena_zalihe[i].value))
             novi_proizvodi_list.append([artikal_zalihe[i].value, naziv_zalihe[i].value, stanje_zalihe[i].value, cena_zalihe[i].value])
+            #novi proizvod moze da ima stanje manje od 0 ako ovu funkciju preklopis sa funkcijom promena_cene_stanje()
             if stanje_zalihe[i].value > 0:
                 counter = 1
                 fisherman.cell(row=fisherman.max_row + counter, column=1).value = naziv_zalihe[i].value
@@ -121,16 +124,17 @@ def novi_proizvodi():
                 fisherman.cell(row=fisherman.max_row , column=13).value = "2021-04-30 00:00:13"
                      
     print("lista novih proizvoda: " + str(novi_proizvodi_list))
+    save_excel()
     # izrada izvestaja o novim proizvodima
-    report = messagebox.askquestion("Report", "Da li zelite da sacuvate report u excel fajl?")
-    if report == 'yes':
-        report_book = Workbook()
-        report_sheet = report_book.active
-        report_sheet.append(["artikal", "naziv", "stanje", "cena"])
-        for i in range(novi_proizvodi_list.__len__()):
-            report_sheet.append(novi_proizvodi_list[i])
-        report_book.save("reportaza.xlsx")
-        showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
+    # report = messagebox.askquestion("Report", "Da li zelite da sacuvate report u excel fajl?")
+    # if report == 'yes':
+    #     report_book = Workbook()
+    #     report_sheet = report_book.active
+    #     report_sheet.append(["artikal", "naziv", "stanje", "cena"])
+    #     for i in range(novi_proizvodi_list.__len__()):
+    #         report_sheet.append(novi_proizvodi_list[i])
+    #     report_book.save("report.xlsx")
+    #     showinfo(title='Report', message="Report je sacuvan u report.xlsx fajlu")
 
 # funkcija za proveru i promenu kategorije
 def promena_kategorije():
@@ -141,7 +145,6 @@ def promena_kategorije():
                 print(kategorija_fisherman[i].value)
             else:
                 continue
-    save_excel()
 
 # proizvodi kojih nema na zalihama ili su na zalihama ali ih nema na stanju, promeni cenu na nulu
 # funkcije su razdvojene zbog performansi
@@ -152,7 +155,6 @@ def promena_cene_zalihe():
             cena_fisherman[i].value = 0
         else:
             continue
-    save_excel()
 
 def promena_cene_stanje():
     for i in range(sifra_fisherman.__len__()):
@@ -162,7 +164,6 @@ def promena_cene_stanje():
                 cena_fisherman[i].value = 0
             else:
                 continue
-    save_excel()
 
 # funkcija za poredjenje cena na zalihama i u fishermanu
 def poredjenje_cena():
@@ -171,7 +172,6 @@ def poredjenje_cena():
             if sifra_fisherman[i].value == artikal_zalihe[j].value and cena_fisherman[i].value != cena_zalihe[j].value:
                 print("fisherman: " + sifra_fisherman[i].value + " cena: " + str(cena_fisherman[i].value) + " nova cena: " + str(cena_zalihe[j].value))
                 cena_fisherman[i].value = cena_zalihe[j].value
-    save_excel()
 
 # pretraga proizvoda po sifri
 def pretraga_po_sifri():
